@@ -1,0 +1,20 @@
+! RUN_LIST.dat: Here we are trying to make a list of all of our runs that we will keep a talbe of information
+! about each run. So when we load up a run it will know where to look for ever thing
+! Currently this is our set up for how each line should be written. My Idea that to start we can
+! by manualy enter in all this information and then develope software to do this when you enter
+! a run that is not included.
+!
+! Some notes about this file:
+!   ! is a comment and so the line is skipped when read in run.init
+!   The @DEFF line is used to tell the run object what quantities it 
+!       will need to make dictionary entries for. 
+!   Blank lines and blank spaces are hopefully ingored
+! Good luck and try not to change too much too quickly
+
+run_name reconn714
+param_file /glade/scratch/colbyh/reconn714_7/staging/param_reconn714
+movie_path /glade/scratch/colbyh/reconn714_7/staging/
+dump_path /glade/scratch/colbyh/reconn714_7/staging/
+idl_restore_file /glade/p/work/colbyh/2014.Winter.electron.heating.paper/dat_files/reconn714_lower_timeave.dat
+
+

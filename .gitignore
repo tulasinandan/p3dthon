@@ -53,4 +53,4 @@ coverage.xml
 docs/_build/
 
 # Run info files
-run_info/*.info
+ run_info/*.info
