@@ -1,4 +1,7 @@
 /* C functions for the test particle module */
+/* Incase you forget how to compile the shared lib file
+ * gcc -o functions.so -shared -fPIC functions.c
+ */
 
 
 
@@ -156,6 +159,9 @@ void moveall(double *pos,
 
     int it, p;
     double r[3], v[3], rnew[3], vnew[3];
+    double xmax, ymax;
+    xmax = xmin+dx*(nx-1);
+    ymax = ymin+dy*(ny-1);
 
 /*
     printf("movallC : npart(%d), nt(%d),ito(%d),charge(%lf),mass(%lf),dt(%lf)xymin(%lf,%lf),nxy(%d,%d)\n",
@@ -209,6 +215,15 @@ void moveall(double *pos,
             /* get r(it) based on v(it) */
             move(r, vnew, dt, rnew);
 
+            /* double periodic wrapping */
+            if (rnew[0] > xmax){ rnew[0] = xmin;}
+            if (rnew[0] < xmin){ rnew[0] = xmax;}
+            if (rnew[1] > ymax){ rnew[0] = ymin;}
+            if (rnew[1] < ymin){ rnew[0] = ymax;}
+            /* open periodict wrapping */
+            //if (rnew[1] > ymax){ rnew[1] = pos(1,p,it-1); vel(1,p,it) = -1.*vel(1,p,it);}
+            //if (rnew[1] > ymin){ rnew[1] = pos(1,p,it-1); vel(1,p,it) = -1.*vel(1,p,it);}
+
             pos(0,p,it) = rnew[0];
             pos(1,p,it) = rnew[1];
             pos(2,p,it) = rnew[2];
@@ -242,7 +257,6 @@ void moveall(double *pos,
         {
             /* so we now know the positions and velocities at it-1
              * and want to calculate those at it*/
-
             /* positions and velocity at t = it+1 */
             r[0] = pos(0,p,it-1);
             r[1] = pos(1,p,it-1);
@@ -261,6 +275,15 @@ void moveall(double *pos,
 
             /* get r(it) based on v(it) */
             move(r, vnew, dt, rnew);
+
+            /* double periodic wrapping */
+            if (rnew[0] > xmax){ rnew[0] = xmin;}
+            if (rnew[0] < xmin){ rnew[0] = xmax;}
+            if (rnew[1] > ymax){ rnew[0] = ymin;}
+            if (rnew[1] < ymin){ rnew[0] = ymax;}
+            /* open periodict wrapping */
+            //if (rnew[1] > ymax){ rnew[1] = pos(1,p,it-1); vel(1,p,it) = -1.*vel(1,p,it);}
+            //if (rnew[1] > ymin){ rnew[1] = pos(1,p,it-1); vel(1,p,it) = -1.*vel(1,p,it);}
 
             pos(0,p,it) = rnew[0];
             pos(1,p,it) = rnew[1];

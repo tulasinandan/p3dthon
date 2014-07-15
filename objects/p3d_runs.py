@@ -295,7 +295,7 @@ class p3d_run(object):
                 self.param_dict[key] = val
 
 
-    def reff_movie(self,movie_num=0):
+    def reff_movie(self,movie_num=-1):
         import p3d_movie
 # load_param requires a path for the param file! a run_info_dict entry of 'param_path'
 
@@ -313,9 +313,9 @@ class p3d_run(object):
 
         if not (hasattr(self,'param_dict')): self.load_param()
 
-        self.movie = p3d_movie.p3d_movie(self.run_info_dict['movie_path'],movie_num,self.param_dict)
-        
 
+        self.movie = p3d_movie.p3d_movie(self.run_info_dict['movie_path'],self.param_dict,movie_num)
+        
 
 
     def get_info(self):

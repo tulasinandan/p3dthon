@@ -19,12 +19,13 @@ import os
 import datetime
 import numpy as np
 import struct
+import glob
 from scipy.io.idl import readsav
 
 class p3d_movie(object):
     """p3d_run object """
 
-    def __init__(self, movie_path, movie_num, param_dict): 
+    def __init__(self, movie_path, param_dict, movie_num=-1): 
         """ Initilazition Routine for the p3d_run object
 
         Fill in method discription
@@ -43,15 +44,20 @@ class p3d_movie(object):
         11:21:19.671182
         """
 
-        if movie_num/10 > 1:
-            if movie_num/100 > 1:
-                self.movie_num_str = str(movie_num)
-            else: self.movie_num_str = '0'+str(movie_num)
-        else:  self.movie_num_str = '00'+str(movie_num)
-
-        self.movie_path = movie_path
+        if movie_path.strip()[-1] == '/': self.movie_path = movie_path[:-1].strip()
+        else: self.movie_path = movie_path
         self.movie_num = movie_num
         self.param_dict = param_dict
+
+        if movie_num < 0: movie_num = self._movie_num_options()
+
+        if movie_num/10 > 0:
+            if movie_num/100 > 0:
+                self.movie_num_str = str(movie_num)
+            else: 
+                self.movie_num_str = '0'+str(movie_num)
+        else:  self.movie_num_str = '00'+str(movie_num)
+
 
         self.set_movie_arr()
 
@@ -170,6 +176,10 @@ class p3d_movie(object):
 
         #byte_movie = np.fromfile(fname,dtype=np.dtype('int8'))
         #arr_size = [self.param_dict['pex']*self.param_dict['nx'],self.param_dict['pey']*self.param_dict['ny']]
+        if movie_path.strip()[-1] == '/': self.movie_path = movie_path[:-1].strip()
+        else: self.movie_path = movie_path
+        self.movie_num = movie_num
+        self.param_dict = param_dict
         #num_time_steps = len(byte_movie)/arr_size[0]/arr_size[1]
         #working_dir
         #os.chdir(working_dir)
@@ -196,4 +206,17 @@ class p3d_movie(object):
         return byte_arr
         
 
+    def _movie_num_options(self):
+        choices = glob.glob(self.movie_path+'/movie.bz.*')
+        if len(choices) == 0: 
+            print '!!! WARNING: the direcotry we are looking in does not have any moive.bz.XXX so we are crashing'
+            return -1
+        for var in range(np.size(choices)):
+            choices[var] = choices[var][-3:]
+        print 'Select from the following possible moive numbers: \n'+str(choices),
+        movie_num_int = raw_input()
+        return int(movie_num_int)
+            
+        
+        
 
