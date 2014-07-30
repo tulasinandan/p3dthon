@@ -39,9 +39,12 @@ from scipy.io.idl import readsav
 #print 'loaded temp?'
 
 # Currently Configured for Yellowstone
+# This should be revamped, this is now a clean way to do this
 USER = 'colbyh'
-HOME_PATH = '/glade/u/home/'+USER+'/'
-P3DTHON_PATH = HOME_PATH+'pythonprogs/2014.04.p3d_etal/'
+#HOME_PATH = '/glade/u/home/'+USER+'/' 
+HOME_PATH = os.path.expanduser('~/')
+#P3DTHON_PATH = HOME_PATH+'pythonprogs/2014.04.p3d_etal/'
+P3DTHON_PATH = HOME_PATH+'Programing/pythonprogs/'
 SCRATCH_PATH = '/glade/scratch/'+USER+'/'
 
 ########################################################################################################################################################
@@ -71,6 +74,7 @@ class p3d_run(object):
 
 # First Check to see if the runname.info file exsists for this run
         self.run_info_file = P3DTHON_PATH+'p3dthon/run_info/'+runname.lower()+'.info'
+# Lets try to using the pwd to acess the run_info directory
         if os.path.isfile(self.run_info_file):
 # File exsists! load up all the run data
             print 'File found and opened!!'
@@ -221,13 +225,13 @@ class p3d_run(object):
         f.close()
         
 
-    def test_info_key(self,key,info_discription=''):
+    def test_info_key(self,key,info_discription='',path_flag=False):
         """ A Method that checks to seff a this peice of info is in the run.info file
             If the peice of info is not contained it addes its to the set
         """
         if key not in self.run_info_dict.keys():
-            print '### WARNING: Key %s not found in run.info file!\n' % key
-            print "             Would you like to add %s to run.infofile (y/''))?" % key
+            print '### WARNING: Key %s not found in run.info file!' % key
+            print "    Would you like to add %s to run.infofile (y/''))?" % key,
             get_raw = raw_input()
             if get_raw.lower() != 'y':
                 print 'OK, no info added to run.info file! ABORTING METHOD CALL!!'
@@ -237,9 +241,10 @@ class p3d_run(object):
                 if len(info_discription) >0:
                     print 'Info Discription: %s' % (info_discription)
                 get_raw = raw_input()
-                self.add_info_keyval(key,get_raw)
+                if path_flag: self.add_info_keyval(key,os.path.abspath(get_raw))
+                else: self.add_info_keyval(key,get_raw)
                 
-    def change_info_val(self,key,info_discription=''):
+    def change_info_val(self,key,info_discription='',path_flag=False):
         """ A Method that allows you to change a value coresponding to a particular key in the run.info file
         """
         print '### Attempting to change the value for the key  %s' % key
@@ -267,15 +272,15 @@ class p3d_run(object):
             It will try and then ask for where the file is. if it doent know
         """
 # load_param requires a path for the param file! a run_info_dict entry of 'param_path'
-        if self.test_info_key('param_path','Full path of param file for this run, included the files name') == -1:
+        if self.test_info_key('param_path','Full path of param file for this run, included the files name',path_flag=True) == -1:
             print 'Necesarry Path for the Param File not Set!!! ABORTING!!!'
             return -1
         self.param_dict = {}
 # Add a try catch statment incase you cant find the file
-        fname = os.path.expanduser(self.run_info_dict['param_path']).strip()
-        scratch_sub = "/glade/scratch/colbyh"
-        if fname.find("$SCRATCH") > -1:
-            fname = fname[0:fname.find("$SCRATCH")]+scratch_sub+fname[fname.find("$SCRATCH")+8:]
+        fname = os.path.abspath(os.path.expandvars(self.run_info_dict['param_path']))
+        #scratch_sub = "/glade/scratch/colbyh"
+        #if fname.find("$SCRATCH") > -1:
+        #    fname = fname[0:fname.find("$SCRATCH")]+scratch_sub+fname[fname.find("$SCRATCH")+8:]
 
         while not os.path.isfile(fname):
             self.change_info_val('param_path')
@@ -302,7 +307,7 @@ class p3d_run(object):
 # load_movie_log requires a path for the log file! a run_info_dict entry of 'movie_path'
 #
 #CoOLBY!!! make sure you pad movie num
-        if self.test_info_key('movie_path','Path of directory for movie files for this run') == -1:
+        if self.test_info_key('movie_path','Path of directory for movie files for this run',path_flag=True) == -1:
             print 'Necesarry Path for the Movie.log File not Set!!! ABORTING!!!'
             return -1    
         print self.run_info_dict['movie_path']
@@ -321,6 +326,7 @@ class p3d_run(object):
     def get_info(self):
         """ A Method that returns all of the run information that the object has
         """
+
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
