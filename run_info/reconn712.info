@@ -1,9 +1,0 @@
-! run.info file = /glade/u/home/colbyh/pythonprogs/2014.04.p3d_etal/p3dthon/run_info/reconn712.info
-! File Created With /glade/u/home/colbyh/pythonprogs/2014.04.p3d_etal/p3dthon/objects/p3d_runs.py
-! File Created on 2014.4.28 at 22:44:53 (Hr:Min:Sec) (NOTE: if yellowstone then Mnt Std Time)
-
-! File Last Updated on 2014.5.18 at 22:43:6
-
-param_path /glade/scratch/colbyh/reconn712/param_reconn712
-movie_path /glade/scratch/colbyh/reconn712/
-run_name reconn712
