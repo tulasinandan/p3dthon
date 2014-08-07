@@ -43,8 +43,10 @@ from scipy.io.idl import readsav
 USER = 'colbyh'
 #HOME_PATH = '/glade/u/home/'+USER+'/' 
 HOME_PATH = os.path.expanduser('~/')
+#c# The first two should be obselte now!
 #P3DTHON_PATH = HOME_PATH+'pythonprogs/2014.04.p3d_etal/'
-P3DTHON_PATH = HOME_PATH+'Programing/pythonprogs/'
+#P3DTHON_PATH = HOME_PATH+'Programing/pythonprogs/'
+P3DTHON_PATH = os.path.abspath(os.path.dirname(os.path.realpath(__file__))+'/../../')+'/'
 SCRATCH_PATH = '/glade/scratch/'+USER+'/'
 
 ########################################################################################################################################################
@@ -69,6 +71,7 @@ class p3d_run(object):
         2013-05-01
         11:21:19.671182
         """
+        print P3DTHON_PATH
 
         self.run_info_dict={'run_name':runname.lower()}
 
@@ -299,8 +302,27 @@ class p3d_run(object):
                     val = 'NO_ARG'
                 self.param_dict[key] = val
 
+    def load_movie(self,var='NOT_SET',time=-1,change_movie=False):
+        """ Outer class wrapper for the inner class method load_movie
 
-    def reff_movie(self,movie_num=-1):
+        Load movie files for a given set of varibles.
+        You can pass as a list, or a single string, or a keyword all
+
+        @return: @todo
+
+        Exemple  :
+
+        Creation
+        :
+        2014-08-07
+        """
+        if (not hasattr(self,'movie') or change_movie == True):
+            print 'Hello Colby we made it inside this if statment'
+            self._reff_movie()
+        self.movie.load_movie(var,time)
+
+
+    def _reff_movie(self,movie_num=-1):
         import p3d_movie
 # load_param requires a path for the param file! a run_info_dict entry of 'param_path'
 
@@ -412,65 +434,65 @@ class p3d_run(object):
 
 
 
-#---------------------------------------------------------------------------------------------------------------
-#   Method: load_movie
-#   Args  : movie_num (to identify which of the posible several movie files to read from)
-#         : movie_var (to identify which varible you want to read)
-#         : movie_time (to identify which slice of time should be read)
-#       This accepts the run name idetifies the coresponding
-#       information in the run_list.dat file.
-#---------------------------------------------------------------------------------------------------------------
-    #def load_movie(self,movie_num,movie_var,movie_time):
-    def load_movie(self,arg_list):
-        if len(arg_list) < 3: 
-            print 'ERROR: Wrong number of arguments. load_movie() accepts a list of 3 args:'
-            print '       [Movie_number, Movie_Variable, Moive_time'
-            return -1
-        else:
-            movie_num = arg_list[0]
-            movie_var = arg_list[1]
-            movie_time= arg_list[2]
-
-        self.load_movie_log(movie_num)
-        
-        #movie_log_arr = self.read_movie_log(movie_num)
-        #param_dict = read_param(runnum)
-
-        
-        fname = self.run_id_dict['movie_path']+'/movie.'+movie_var+'.'+str(movie_num)
-        fname = os.path.expanduser(fname)
-        #NOTE: Changing Dir give factor of 2 time incresse
-        #We are changing path to try to speed things up
-        working_dir = os.getcwd()
-        os.chdir(os.path.expanduser(self.run_id_dict['movie_path']))
-
-        #NOTE: we are reading the whole movie file in one shot!
-        # this seems wastefull
-        print "Restoring Varible '"+movie_var+"' From File '"+fname+"'"
-        byte_movie = np.fromfile(fname,dtype=np.dtype('int8'))
-        arr_size = [self.param_dict['pex']*self.param_dict['nx'],self.param_dict['pey']*self.param_dict['ny']]
-        #num_time_steps = len(byte_movie)/arr_size[0]/arr_size[1]
-
-        working_dir
-        os.chdir(working_dir)
-
-# This seems to be working but we need to generalize for any file
-# Also It would be good to have some kinda of print out talkting about
-# How many movies there are and all that non sence.
-        
-#This is just doing it for the first time step, we can generlize later
-        lmin = self.movie_log_dict[movie_var][movie_time][0]
-        lmax = self.movie_log_dict[movie_var][movie_time][1]
-        byte_ip1 = movie_time*arr_size[0]*arr_size[1]
-        byte_ip2 = byte_ip1 + arr_size[0]*arr_size[1]
-
-        print 'There are '+str(len(byte_movie)/arr_size[0]/arr_size[1])+ \
-        ' movie files and you loaded number ' +str(movie_time+1)
-
-        real_arr_1 = byte_movie[byte_ip1:byte_ip2]*(lmax-lmin)/255.0+ lmin
-
-
-        return real_arr_1.reshape(arr_size[1],arr_size[0])
+#c# #---------------------------------------------------------------------------------------------------------------
+#c# #   Method: load_movie
+#c# #   Args  : movie_num (to identify which of the posible several movie files to read from)
+#c# #         : movie_var (to identify which varible you want to read)
+#c# #         : movie_time (to identify which slice of time should be read)
+#c# #       This accepts the run name idetifies the coresponding
+#c# #       information in the run_list.dat file.
+#c# #---------------------------------------------------------------------------------------------------------------
+#c#     #def load_movie(self,movie_num,movie_var,movie_time):
+#c#     def load_movie(self,arg_list):
+#c#         if len(arg_list) < 3: 
+#c#             print 'ERROR: Wrong number of arguments. load_movie() accepts a list of 3 args:'
+#c#             print '       [Movie_number, Movie_Variable, Moive_time'
+#c#             return -1
+#c#         else:
+#c#             movie_num = arg_list[0]
+#c#             movie_var = arg_list[1]
+#c#             movie_time= arg_list[2]
+#c# 
+#c#         self.load_movie_log(movie_num)
+#c#         
+#c#         #movie_log_arr = self.read_movie_log(movie_num)
+#c#         #param_dict = read_param(runnum)
+#c# 
+#c#         
+#c#         fname = self.run_id_dict['movie_path']+'/movie.'+movie_var+'.'+str(movie_num)
+#c#         fname = os.path.expanduser(fname)
+#c#         #NOTE: Changing Dir give factor of 2 time incresse
+#c#         #We are changing path to try to speed things up
+#c#         working_dir = os.getcwd()
+#c#         os.chdir(os.path.expanduser(self.run_id_dict['movie_path']))
+#c# 
+#c#         #NOTE: we are reading the whole movie file in one shot!
+#c#         # this seems wastefull
+#c#         print "Restoring Varible '"+movie_var+"' From File '"+fname+"'"
+#c#         byte_movie = np.fromfile(fname,dtype=np.dtype('int8'))
+#c#         arr_size = [self.param_dict['pex']*self.param_dict['nx'],self.param_dict['pey']*self.param_dict['ny']]
+#c#         #num_time_steps = len(byte_movie)/arr_size[0]/arr_size[1]
+#c# 
+#c#         working_dir
+#c#         os.chdir(working_dir)
+#c# 
+#c# # This seems to be working but we need to generalize for any file
+#c# # Also It would be good to have some kinda of print out talkting about
+#c# # How many movies there are and all that non sence.
+#c#         
+#c# #This is just doing it for the first time step, we can generlize later
+#c#         lmin = self.movie_log_dict[movie_var][movie_time][0]
+#c#         lmax = self.movie_log_dict[movie_var][movie_time][1]
+#c#         byte_ip1 = movie_time*arr_size[0]*arr_size[1]
+#c#         byte_ip2 = byte_ip1 + arr_size[0]*arr_size[1]
+#c# 
+#c#         print 'There are '+str(len(byte_movie)/arr_size[0]/arr_size[1])+ \
+#c#         ' movie files and you loaded number ' +str(movie_time+1)
+#c# 
+#c#         real_arr_1 = byte_movie[byte_ip1:byte_ip2]*(lmax-lmin)/255.0+ lmin
+#c# 
+#c# 
+#c#         return real_arr_1.reshape(arr_size[1],arr_size[0])
         
 
 

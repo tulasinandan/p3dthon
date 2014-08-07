@@ -81,7 +81,7 @@ class p3d_movie(object):
         #Set moive.log path
 
         fname = self.movie_path+'/movie.log.'+self.movie_num_str
-        fname = os.path.expanduser(fname)
+        fname = os.path.abspath(fname)
         print "Loading movie.log file '%s'"%fname
         #Read moive.log
         movie_log_arr = np.loadtxt(fname) 
@@ -110,7 +110,7 @@ class p3d_movie(object):
 #       information in the run_list.dat file.
 #---------------------------------------------------------------------------------------------------------------
     #def load_movie(self,movie_num,movie_var,movie_time):
-    def load_movie(self,time=-1,var='NOT_SET',local=False):
+    def load_movie(self,var='NOT_SET',time=-1,local=False):
         """ A method to load a particular value for a given time 
 
         Load movie files for a given set of varibles.
@@ -157,9 +157,17 @@ class p3d_movie(object):
             # this seems wastefull
             print "Restoring Varible '"+cosa+"' From File '"+fname+"'"
 
+            if 'double_byte' in self.param_dict:
+                dat_type = 'int16'
+                norm_cst = 256**2-1
+            else: #single byte precision
+                dat_type = 'int8'
+                norm_cst = 256-1
 
-            fp = np.memmap(fname, dtype='int8', mode='r',shape=(self.num_of_times,ney,nex)) 
-            byte_arr = np.frombuffer(fp[time],dtype='int8')
+            print 'dat_type = ',dat_type
+
+            fp = np.memmap(fname, dtype=dat_type, mode='r',shape=(self.num_of_times,ney,nex)) 
+            byte_arr = np.frombuffer(fp[time],dtype=dat_type)
             byte_arr = byte_arr.reshape(ney,nex).transpose()
 
 # This seems to be working but we need to generalize for any file
@@ -176,13 +184,19 @@ class p3d_movie(object):
             #print 'There are '+str(len(byte_movie)/arr_size[0]/arr_size[1])+ \
             #' movie files and you loaded number ' +str(movie_time+1)
 
-            return_dict[cosa] = byte_arr*(lmax[time]-lmin[time])/255.0+ lmin[time]
+            return_dict[cosa] = byte_arr*(lmax[time]-lmin[time])*1.0/norm_cst + lmin[time]
 
 
         #return real_arr_1.reshape(arr_size[1],arr_size[0])
         #return np.transpose(return_arr)
         #return return_arr
-        return return_dict
+        if np.size(return_dict.keys()) == 1:
+            return return_dict[return_dict.keys()[0]]
+        elif np.size(return_dict.keys()) > 1: 
+            return return_dict
+        else:
+            print 'I dont know why the return_dict in this method (load_movie) is empty?'
+            return -1
         #return byte_arr
         
 
@@ -246,8 +260,6 @@ class p3d_movie(object):
     def _set_local(self,dict_to_local):
         #c# exe_command = "global bx; bx = dict_to_local['bx']"
         #c# exe_command = "bx = dict_to_local['bx']"
-        #c# global foobar
-        #c# foobar=42
         #c# print exe_command
         #c# eval(exe_command)
         return 'Not coded !!!'
